@@ -1,5 +1,5 @@
 # SigScanner
-A simple PE function signature dumper written in C. (no dependencies)
+A simple PE function signature dumper written in C11 with no external dependencies.
 
 ## Usage
 ```
