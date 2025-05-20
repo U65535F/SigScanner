@@ -1,5 +1,5 @@
 # SigScanner
-A simple PE function signature dumper written in C. (no dependencies)
+A simple PE function signature dumper written in C11 with no external dependencies.
 
 ## Usage
 ```
@@ -35,4 +35,4 @@ meson compile -C build
 ```
 You will find the executable file inside the build directory.
 
-> If any reason you can't have Meson, then use the VS Developer Command Prompt to compile via `cl /W4 /DUNICODE /D_UNICODE /TC Main.c Pdb.c Signature.c Error.c /link DbgHelp.lib WinHttp.lib`.
+> If any reason you can't have Meson, then use the VS Developer Command Prompt to compile via `cl /W4 /DUNICODE /D_UNICODE /TC Main.c Pdb.c Signature.c Error.c /link DbgHelp.lib WinHttp.lib /out:SigScanner.exe`.
