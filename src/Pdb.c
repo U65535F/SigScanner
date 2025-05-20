@@ -76,7 +76,7 @@ Error GetPEInfo(LPCWSTR filePath, struct PDBLookupContext* pPdbLookupCtx)
 
                     CHAR* nameBuffer = (CHAR*)malloc(MAX_PATH * 3);
                     if (!nameBuffer) {
-                        e = NewError(__FUNCTION__, -12, L"malloc failed", GetLastError());
+                        e = NewError(__FUNCTION__, -12, L"malloc failed; out of memory", 0);
                         break;
                     }
                     DWORD idx = 0;
@@ -151,16 +151,23 @@ Error DownloadPDB(struct PDBLookupContext* pPdbLookupCtx, LPCWSTR outputPath) {
             break;
         }
 
-        BYTE buffer[1 << 16]; // 64kb
+        BYTE* buffer = (BYTE*)malloc((1 << 6) * sizeof(BYTE)); // 64 KB
+        if (!buffer) {
+            e = NewError(__FUNCTION__, -7, L"malloc failed; Out of memory", 0);
+            break;
+        }
+
         DWORD downloadedSize = 0, writtenSize = 0;
         while (WinHttpReadData(hRequest, buffer, sizeof(buffer), &downloadedSize) && downloadedSize > 0)
         {
             if (!WriteFile(hOut, buffer, downloadedSize, &writtenSize, NULL) || writtenSize != downloadedSize)
             {
                 e = NewError(__FUNCTION__, -7, L"WriteFile failed", GetLastError());
+                free(buffer);
                 break;
             }
         }
+        free(buffer);
     } while (FALSE);
 
     if (hOut) CloseHandle(hOut);

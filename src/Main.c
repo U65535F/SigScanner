@@ -41,10 +41,12 @@ int wmain(int argc, wchar_t* argv[])
     WCHAR* pePath = argv[1];
     WCHAR* funcName = argv[2];
     DWORD sigLength = _wtoi(argv[3]);
+
     wprintf(L"[+] Supplied PE path: %s\n", pePath);
     wprintf(L"[+] Supplied function name: %s\n", funcName);
-    wprintf(L"[+] Signature length: %lu\n", sigLength);
+    wprintf(L"[+] Input Signature length: %lu\n", sigLength);
     wprintf(L"[+] Extracting PE information\n");
+
     struct PDBLookupContext ctx;
     Error e = GetPEInfo(pePath, &ctx);
     if (e.ContainsError) {
@@ -101,6 +103,13 @@ int wmain(int argc, wchar_t* argv[])
         return 1;
     }
 
+    BOOL isUnique;
+    BYTE* uniqueSigBuffer;
+    DWORD uniqueSigLength;
+    e = FindUniqueSignature(pePath, sigBuffer, sigLength, funcRVA, &isUnique, &uniqueSigBuffer, &uniqueSigLength);
+    if (e.ContainsError) 
+        fwprintf(stderr, L"[-] WARNING: unique signature check failed: %s\n", e.Format(&e));
+
     wprintf(L"Signature (%d bytes):\n", sigLength);
     for (DWORD i = 0; i < sigLength; i++) {
         wprintf(L"0x%02X", sigBuffer[i]);
@@ -109,6 +118,27 @@ int wmain(int argc, wchar_t* argv[])
     }
     wprintf(L"\n");
     free(sigBuffer);
+
+    if (!isUnique) {
+        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+        CONSOLE_SCREEN_BUFFER_INFO consoleScreenBufferInfo;
+        GetConsoleScreenBufferInfo(hConsole, &consoleScreenBufferInfo);
+        WORD oldAttributes = consoleScreenBufferInfo.wAttributes;
+
+        // yellow/orange color
+        SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+        wprintf(L"\nWARNING: the above %lu-byte pattern repeats in the image.\nMinimal unique signature is %lu bytes:\n",
+            sigLength, uniqueSigLength);
+
+        SetConsoleTextAttribute(hConsole, oldAttributes);
+        wprintf(L"Unique signature (%d bytes):\n", uniqueSigLength);
+        for (DWORD i = 0; i < uniqueSigLength; i++) {
+            wprintf(L"0x%02X", uniqueSigBuffer[i]);
+            if ((i + 1) < uniqueSigLength)
+                wprintf(L", ");
+        }
+        wprintf(L"\n");
+    }
 
     return 0;
 }
