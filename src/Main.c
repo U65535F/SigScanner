@@ -127,8 +127,7 @@ int wmain(int argc, wchar_t* argv[])
 
         // yellow/orange color
         SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-        wprintf(L"\nWARNING: the above %lu-byte pattern repeats in the image.\nMinimal unique signature is %lu bytes:\n",
-            sigLength, uniqueSigLength);
+        wprintf(L"\nWARNING: the above %lu-byte pattern repeats in the image.\nMinimal unique signature is %lu bytes.\n", sigLength, uniqueSigLength);
 
         SetConsoleTextAttribute(hConsole, oldAttributes);
         wprintf(L"Unique signature (%d bytes):\n", uniqueSigLength);
