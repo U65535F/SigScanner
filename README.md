@@ -39,12 +39,12 @@ You will find the executable file inside the build directory.
 > If any reason you can't have Meson, then use the VS Developer Command Prompt to compile via `cl /W4 /DUNICODE /D_UNICODE /TC Main.c Pdb.c Signature.c Error.c /link DbgHelp.lib WinHttp.lib /out:SigScanner.exe`.
 
 ## TODOs
-[ ] Make signature length optional and force minimum unique signature length
-[ ] Add command line parameters
+- [ ] Make signature length optional and force minimum unique signature length
+- [ ] Add command line parameters
   - [ ] dump C signature
   - [ ] no pdb download/use from disk
   - [ ] signature length
-[ ] Improve error messages
+- [ ] Improve error messages
 
 ### How to Contribute:
 1. **Fork the Repository**: Fork this repository to your GitHub account.
